@@ -13,5 +13,9 @@ class Oystercard
     @balance += money
     "Your new balance is £#{balance}"
   end
+  
+  def deduct money
+      @balance -= money
+  end
 
 end

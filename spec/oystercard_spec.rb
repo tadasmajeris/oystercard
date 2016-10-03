@@ -29,8 +29,16 @@ describe Oystercard do
   describe "#deduct" do
     it "should deduct amount" do
       subject.top_up 40
-      expect {subject.deduct 20}.to change{subject.balance}.by -20
+      expect {subject.deduct 20}.to change{subject.balance}.by (-20)
     end
+  end
+  
+  describe "#in_journey" do
+    it {is_expected.to respond_to(:in_journey)}
+    it "knows it is in a journey" do
+      
+    end
+    
   end
 
 
