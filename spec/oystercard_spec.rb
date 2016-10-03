@@ -17,17 +17,6 @@ describe Oystercard do
     end
   end
 
-  describe "#deduct" do
-    it "wont allow your balance to go below zero" do
-      expect{ subject.deduct(subject.balance+10) }.to raise_error "Cannot deduct! You don't have the funds!"
-    end
-
-    it "should allow you to deduct" do
-      subject.topup(10)
-      expect{ subject.deduct(10) }.to change{ subject.balance }.by -10
-    end
-  end
-
   describe "#in_journey?" do
     it "should return false when card is new" do
       expect(subject).not_to be_in_journey
@@ -44,7 +33,7 @@ describe Oystercard do
       expect{ subject.touch_in }.to raise_error "Insufficient funds"
     end
     it "should allow you to touch in" do
-      allow(subject).to receive(:balance).and_return(Oystercard::MIN_FARE)
+      subject.topup(Oystercard::MIN_FARE)
       subject.touch_in
       expect(subject).to be_in_journey
     end
@@ -55,11 +44,18 @@ describe Oystercard do
       allow(subject).to receive(:in_journey?).and_return(false)
       expect{ subject.touch_out }.to raise_error "Not touched in"
     end
-    it "should allow you to touch out" do
-      allow(subject).to receive(:balance).and_return(Oystercard::MIN_FARE)
+
+    before do
+      subject.topup(Oystercard::MIN_FARE)
       subject.touch_in
+    end
+
+    it "should allow you to touch out" do
       subject.touch_out
       expect(subject).not_to be_in_journey
+    end
+    it "should deduct balance on touch out" do
+      expect{ subject.touch_out }.to change{ subject.balance }.by -Oystercard::MIN_FARE
     end
   end
 end

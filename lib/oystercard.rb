@@ -14,11 +14,6 @@ class Oystercard
     @balance += amount
   end
 
-  def deduct(amount)
-    fail "Cannot deduct! You don't have the funds!" if amount > balance
-    @balance -= amount
-  end
-
   def in_journey?
     @in_journey
   end
@@ -32,6 +27,12 @@ class Oystercard
   def touch_out
     fail "Not touched in" unless in_journey?
     @in_journey = false
+    deduct(MIN_FARE)
   end
 
+  private
+
+  def deduct(amount)
+    @balance -= amount
+  end
 end
