@@ -39,7 +39,12 @@ describe Oystercard do
       allow(subject).to receive(:in_journey?).and_return(true)
       expect{ subject.touch_in }.to raise_error "Already touched in"
     end
+    it "raises an error if balance is insufficient" do
+      allow(subject).to receive(:balance).and_return(0)
+      expect{ subject.touch_in }.to raise_error "Insufficient funds"
+    end
     it "should allow you to touch in" do
+      allow(subject).to receive(:balance).and_return(Oystercard::MIN_FARE)
       subject.touch_in
       expect(subject).to be_in_journey
     end
@@ -51,6 +56,7 @@ describe Oystercard do
       expect{ subject.touch_out }.to raise_error "Not touched in"
     end
     it "should allow you to touch out" do
+      allow(subject).to receive(:balance).and_return(Oystercard::MIN_FARE)
       subject.touch_in
       subject.touch_out
       expect(subject).not_to be_in_journey
