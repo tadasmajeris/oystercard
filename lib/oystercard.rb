@@ -1,3 +1,3 @@
-class Oyster
+class Oystercard
     
 end
