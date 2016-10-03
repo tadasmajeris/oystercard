@@ -14,7 +14,13 @@ describe Oystercard do
   end
 
   it "has a top_up limit" do
-    expect(Oystercard::TOP_UP_LIMIT).to exist
+    #Oystercard::TOP_UP_LIMIT = 10
+    expect(Oystercard::TOP_UP_LIMIT.class).to be Fixnum
+  end
+  
+  it "fails if you try to exceed top-up limit" do
+    expect{subject.top_up 100}.to raise_error "Top-up limit exceeded."
+    
   end
 
 end
