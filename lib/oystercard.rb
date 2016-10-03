@@ -5,6 +5,7 @@ class Oystercard
 
   def initialize
     @balance = 0
+    @in_journey = false
   end
 
   def topup(amount)
@@ -15,6 +16,20 @@ class Oystercard
   def deduct(amount)
     fail "Cannot deduct! You don't have the funds!" if amount > balance
     @balance -= amount
+  end
+
+  def in_journey?
+    @in_journey
+  end
+
+  def touch_in
+    fail "Already touched in" if in_journey?
+    @in_journey = true
+  end
+
+  def touch_out
+    fail "Not touched in" unless in_journey?
+    @in_journey = false
   end
 
 end
