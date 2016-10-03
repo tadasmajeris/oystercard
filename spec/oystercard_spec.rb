@@ -8,5 +8,10 @@ describe Oystercard do
   end
 
   it { is_expected.to respond_to :top_up }
+  
+  it "is expected to top up the card by £10." do
+    subject.top_up 10
+    expect(subject.balance).to eq 10
+  end
 
 end
