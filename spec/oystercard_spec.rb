@@ -24,6 +24,7 @@ describe Oystercard do
     before do
       subject.top_up(Oystercard::TOP_UP_LIMIT)    
     end
+    
     it "fails if you try to exceed top-up limit" do
       #maximum_balance = Oystercard::TOP_UP_LIMIT
       #subject.top_up(maximum_balance)
@@ -45,20 +46,35 @@ describe Oystercard do
     end
   end
 
+describe "touch in touch out" do
+  before do
+    subject.top_up(20)    
+  end
+
+
   describe "#touch_in" do
     it "should make in_journey true" do
       subject.touch_in
       expect(subject).to be_in_journey
     end
   end
-
-  describe "#touch_out" do
+  
+    describe "#touch_out" do
     it "should make in_journey false" do
       subject.touch_in
       subject.touch_out
       expect(subject).not_to be_in_journey
     end
   end
+  
+end  
 
+context "Insufficient money on card" do
+  it "produces an error." do
+      #puts subject.balance
+      #subject.balance = 0
+      expect{subject.touch_in}.to raise_error ("Insufficient money on card for journey.")
+  end
+end
 
 end

@@ -24,6 +24,7 @@ class Oystercard
   end
 
   def touch_in
+    fail "Insufficient money on card for journey." if balance < 1
     @in_journey = true
   end
 
