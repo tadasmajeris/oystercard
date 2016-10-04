@@ -1,3 +1,5 @@
+require_relative 'journey'
+
 class Oystercard
 
   attr_reader :balance, :journey, :journeys
@@ -7,7 +9,7 @@ class Oystercard
   def initialize
     @balance = 0
     @journeys = []
-    @journey = {}
+    @journey = nil
   end
 
   def topup(amount)
@@ -16,21 +18,21 @@ class Oystercard
   end
 
   def in_journey?
-    !@journey.empty?
+    !@journey.nil?
   end
 
   def touch_in(station)
-    fail "Already touched in" if in_journey?
-    fail "Insufficient funds" if balance < MIN_FARE
-    journey[:start] = station
+    fail "Insufficient funds" if balance < Journey::MIN_FARE
+    journey.finish() if journey
+    @journey = Journey.new({entry_station: station})
   end
 
   def touch_out(station)
-    fail "Not touched in" unless in_journey?
-    deduct(MIN_FARE)
-    journey[:end] = station
+    @journey = journey || Journey.new
+    @journey = journey.finish(station)
+    deduct(journey.fare)
     add_journey
-    @journey = {}
+    @journey = nil
   end
 
   def includes_journey?(journey)

@@ -2,8 +2,8 @@ require "oystercard"
 
 describe Oystercard do
 
-  let(:start_station) { double(:station)}
-  let(:end_station) { double(:station)}
+  let(:start_station) { double(:station) }
+  let(:end_station) { double(:station) }
 
   describe "Initialization" do
     it "creates an empty journey history" do
@@ -13,7 +13,7 @@ describe Oystercard do
       expect(subject.balance).to eq 0
     end
     it "creates an empty journey" do
-      expect(subject.journey).to be {}
+      expect(subject.journey).to be nil
     end
   end
 
@@ -35,10 +35,6 @@ describe Oystercard do
   end
 
   describe "#touch_in" do
-    it "raises an error if are already in a journey" do
-      allow(subject).to receive(:in_journey?).and_return(true)
-      expect{ subject.touch_in(start_station) }.to raise_error "Already touched in"
-    end
     it "raises an error if balance is insufficient" do
       allow(subject).to receive(:balance).and_return(0)
       expect{ subject.touch_in(start_station) }.to raise_error "Insufficient funds"
@@ -48,19 +44,9 @@ describe Oystercard do
       subject.touch_in(start_station)
       expect(subject).to be_in_journey
     end
-    it "should record the name of the station you touched in at" do
-      subject.topup(Oystercard::MIN_FARE)
-      subject.touch_in(start_station)
-      expect(subject.journey[:start]).to eq start_station
-    end
   end
 
   describe "#touch_out" do
-    it "raises an error if are not in a journey" do
-      allow(subject).to receive(:in_journey?).and_return(false)
-      expect{ subject.touch_out(end_station) }.to raise_error "Not touched in"
-    end
-
     before do
       subject.topup(Oystercard::MIN_FARE)
       subject.touch_in(start_station)
@@ -74,12 +60,13 @@ describe Oystercard do
       expect{ subject.touch_out(end_station) }.to change{ subject.balance }.by -Oystercard::MIN_FARE
     end
     it "should save a journey" do
+      journey = subject.journey
       subject.touch_out(end_station)
-      expect(subject.includes_journey?({start: start_station, end: end_station})).to be true
+      expect(subject.includes_journey?(journey)).to be true
     end
     it "should forget the start station on touch out" do
       subject.touch_out(end_station)
-      expect(subject.journey).to be {}
+      expect(subject.journey).to be nil
     end
   end
 end
