@@ -34,17 +34,15 @@ describe Oystercard do
   end
 
   describe "#in_journey" do
-    it {is_expected.to respond_to(:in_journey)}
-
-    it "knows it is in a journey" do
-
+    it 'is initially not in a journey' do
+      expect(subject).not_to be_in_journey
     end
   end
 
   describe "#touch_in" do
     it "should make in_journey true" do
       subject.touch_in
-      expect(subject.in_journey).to be true
+      expect(subject).to be_in_journey
     end
   end
 
@@ -52,7 +50,7 @@ describe Oystercard do
     it "should make in_journey false" do
       subject.touch_in
       subject.touch_out
-      expect(subject.in_journey).to be false
+      expect(subject).not_to be_in_journey
     end
   end
 
