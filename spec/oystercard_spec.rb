@@ -2,10 +2,19 @@ require "oystercard"
 
 describe Oystercard do
 
-  start_station = :Wimbledon
+  let(:start_station) { double(:station)}
+  let(:end_station) { double(:station)}
 
-  it "defaults to balance of 0" do
-    expect(subject.balance).to eq 0
+  describe "Initialization" do
+    it "creates an empty journey history" do
+      expect(subject.journeys).to be_empty
+    end
+    it "defaults to balance of 0" do
+      expect(subject.balance).to eq 0
+    end
+    it "creates an empty journey" do
+      expect(subject.journey).to be {}
+    end
   end
 
   describe "#topup" do
@@ -42,14 +51,14 @@ describe Oystercard do
     it "should record the name of the station you touched in at" do
       subject.topup(Oystercard::MIN_FARE)
       subject.touch_in(start_station)
-      expect(subject.start_station).to eq :Wimbledon
+      expect(subject.journey[:start]).to eq start_station
     end
   end
 
   describe "#touch_out" do
     it "raises an error if are not in a journey" do
       allow(subject).to receive(:in_journey?).and_return(false)
-      expect{ subject.touch_out }.to raise_error "Not touched in"
+      expect{ subject.touch_out(end_station) }.to raise_error "Not touched in"
     end
 
     before do
@@ -58,15 +67,19 @@ describe Oystercard do
     end
 
     it "should allow you to touch out" do
-      subject.touch_out
+      subject.touch_out(end_station)
       expect(subject).not_to be_in_journey
     end
     it "should deduct balance on touch out" do
-      expect{ subject.touch_out }.to change{ subject.balance }.by -Oystercard::MIN_FARE
+      expect{ subject.touch_out(end_station) }.to change{ subject.balance }.by -Oystercard::MIN_FARE
+    end
+    it "should save a journey" do
+      subject.touch_out(end_station)
+      expect(subject.includes_journey?({start: start_station, end: end_station})).to be true
     end
     it "should forget the start station on touch out" do
-      subject.touch_out
-      expect(subject.start_station).to be nil
+      subject.touch_out(end_station)
+      expect(subject.journey).to be {}
     end
   end
 end
