@@ -45,14 +45,17 @@ describe Oystercard do
         expect(subject).not_to be_in_journey
       end
     end
-  end
-
-  describe "#deduct" do
-    it "should deduct amount" do
-      subject.top_up 40
-      expect {subject.deduct 20}.to change{subject.balance}.by (-20)
+    it "should deduct £1" do
+      expect{subject.touch_out}.to change{subject.balance}.by(-1)
     end
   end
+
+  # describe "#deduct" do
+  #   it "should deduct amount" do
+  #     subject.top_up 40
+  #     expect {subject.deduct 20}.to change{subject.balance}.by (-20)
+  #   end
+  # end
 
   describe "#in_journey" do
     it 'is initially not in a journey' do
