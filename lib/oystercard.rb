@@ -1,7 +1,7 @@
 class Oystercard
-#This is a test!
+
   TOP_UP_LIMIT = 90
-  MINIMUM_BALANCE = 1
+  MINIMUM_FARE = 1
 
   attr_reader :balance, :in_journey
 
@@ -21,16 +21,17 @@ class Oystercard
   end
 
   def touch_in
-    fail "Insufficient money on card for journey." if balance < MINIMUM_BALANCE
+    fail "Insufficient money on card for journey." if balance < MINIMUM_FARE
     @in_journey = true
   end
 
   def touch_out
     @in_journey = false
-    deduct(MINIMUM_BALANCE)
+    deduct(MINIMUM_FARE)
   end
-  
+
   private
+
   def deduct money
       @balance -= money
   end

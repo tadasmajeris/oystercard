@@ -1,13 +1,10 @@
-require './lib/oystercard'
-#This is a test!
+require 'oystercard'
+
 describe Oystercard do
-  subject(:oystercard) {described_class.new}
 
   it "has an initial balance of 0" do
     expect(subject.balance).to eq 0
   end
-
-  it { is_expected.to respond_to(:top_up).with(1).argument }
 
   describe "#in_journey" do
     it 'is initially not in a journey' do
@@ -15,14 +12,9 @@ describe Oystercard do
     end
   end
 
-  context "When topping up" do
+  describe "#top_up" do
     it "can top up the balance" do
       expect {subject.top_up 10 }.to change{ subject.balance }.by 10
-    end
-
-    it "has a top_up limit" do
-      #Oystercard::TOP_UP_LIMIT = 10
-      expect(Oystercard::TOP_UP_LIMIT.class).to be Fixnum
     end
   end
 
@@ -48,12 +40,12 @@ describe Oystercard do
         subject.touch_out
         expect(subject).not_to be_in_journey
       end
-      
-      it "should deduct £1" do
-      expect{subject.touch_out}.to change{subject.balance}.by(-1)
+
+      it "should deduct £#{Oystercard::MINIMUM_FARE}" do
+        expect{subject.touch_out}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
+      end
     end
-    end
-    
+
   end
 
   context "When card has insufficient money" do
