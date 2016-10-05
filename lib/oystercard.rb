@@ -16,8 +16,6 @@ class Oystercard
     "Your new balance is £#{balance}"
   end
 
-  
-
   def in_journey?
     @in_journey
   end
