@@ -3,16 +3,23 @@ require 'oystercard'
 describe Oystercard do
 
   let(:station) { double :station }
+  let(:station2) { double :station }
+  let(:journey) { {start: station, end: station2} }
 
-  it "has an initial balance of 0" do
-    expect(subject.balance).to eq 0
-  end
-
-  describe "#in_journey?" do
+  describe "Initialization of a card" do
+    it "has an initial balance of 0" do
+      expect(subject.balance).to eq 0
+    end
+  
     it 'is initially not in a journey' do
       expect(subject).not_to be_in_journey
     end
-  end
+  
+    it 'sets journeys as empty at start' do
+      expect(subject.journeys).to eq []
+    end
+    
+   end 
 
   describe "#top_up" do
     it "can top up the balance" do
@@ -36,28 +43,35 @@ describe Oystercard do
       end
       it "should save the entry station" do
         subject.touch_in station
-        expect(subject.entry_station).to eq station
+        expect(subject.journey[:start]).to eq station
       end
     end
 
     describe "#touch_out" do
-      it "should make 'in_journey' false" do
-        subject.touch_in station
-        subject.touch_out
-        expect(subject).not_to be_in_journey
-      end
-
       it "should deduct £#{Oystercard::MINIMUM_FARE}" do
-        expect{subject.touch_out}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
+        expect{subject.touch_out station2}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
       end
-
-      it "sets entry_station to nil" do
-        subject.touch_in station
-        subject.touch_out
-        expect(subject.entry_station).to eq nil
+        
+      context "Complete journey" do
+        before do
+          subject.touch_in station
+          subject.touch_out station2
+        end
+       
+        it "should make 'in_journey' false" do
+          expect(subject).not_to be_in_journey
+        end
+        
+        it "should save the journey" do
+          expect(subject.journeys).to include journey
+        end
+  
+        it "sets journey to empty hash" do
+          expect(subject.journey).to be_empty
+        end
       end
-    end
-
+      
+    end 
   end
 
   context "When card has insufficient money" do
