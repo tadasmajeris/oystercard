@@ -28,7 +28,7 @@ class Oystercard
 
   def touch_out(station)
     deduct(MINIMUM_FARE)
-    @journey[:end] =station
+    @journey[:end] = station
     @journeys << journey
     @journey = {}
     return_balance
@@ -40,7 +40,7 @@ class Oystercard
     "Your balance is £#{balance}"
   end
 
-  def deduct money
+  def deduct(money)
     @balance -= money
   end
 
