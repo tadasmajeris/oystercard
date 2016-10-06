@@ -15,10 +15,29 @@ describe JourneyLog do
     end
 
     it 'records a journey' do
-      allow(journey_class).to receive(:new).and_return journey
       subject.start(station)
       expect(subject.journeys).to include journey
     end
   end
+
+
+  describe '#finish' do
+    let(:exit_station){double :exit_station}
+
+    before {subject.start(station)}
+
+    it 'finishes the journey' do
+      expect(journey).to receive(:finish).with(exit_station)
+      subject.finish(exit_station)
+    end
+
+    it 'resets current_journey to nil' do
+      allow(journey).to receive(:finish).with(exit_station)
+      subject.finish(exit_station)
+      expect(subject.current_journey_reset?).to be true
+    end
+  end
+
+  
 
 end
