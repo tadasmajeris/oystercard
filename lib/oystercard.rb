@@ -4,6 +4,7 @@ class Oystercard
 
   TOP_UP_LIMIT = 90
   MINIMUM_FARE = 1
+  PENALTY_FARE = 6
 
   attr_reader :balance, :journey, :journeys
 
@@ -25,15 +26,25 @@ class Oystercard
 
   def touch_in(station)
     fail "Insufficient money on card for journey." if balance < MINIMUM_FARE
+    if !!@journey
+      puts "You forgot to touch out" 
+      @balance -= PENALTY_FARE
+    end
+    
     @journey = Journey.new(station)
   end
 
   def touch_out(station)
-    deduct(MINIMUM_FARE)
-    @journey.finish(station)
-    @journeys << journey
-    @journey = nil
-    return_balance
+    if !@journey
+      puts "You forgot to touch in" 
+      @balance -= PENALTY_FARE
+    else
+      deduct(MINIMUM_FARE)
+      @journey.finish(station)
+      @journeys << journey
+      @journey = nil
+      return_balance
+    end
   end
 
   private
