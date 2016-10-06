@@ -22,5 +22,19 @@ describe Journey do
       expect(subject.exit_station).to eq station
     end
   end
+  
+  describe '#complete' do
+    it "sets the journey to complete" do
+      subject.finish (station)
+      expect(subject).to be_complete
+    end
+  end
+
+  describe '#fare' do
+    it "sets the correct fare" do
+      subject.finish (station)
+      expect{subject.fare}.to eq Journey::MINIMUM_FARE   
+    end
+  end
 
 end
