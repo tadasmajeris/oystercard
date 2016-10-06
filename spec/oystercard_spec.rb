@@ -43,14 +43,8 @@ describe Oystercard do
       end
       it "should save the entry station" do
         subject.touch_in station
-        expect(subject.journey[:start]).to eq station
+        expect(subject.journey.entry_station).to eq station
       end
-
-      it 'creates a new journey' do
-        journey = subject.touch_in(station)
-        expect(journey.class).to eq Journey
-      end
-
     end
 
     describe "#touch_out" do
