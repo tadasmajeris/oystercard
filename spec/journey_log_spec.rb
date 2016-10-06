@@ -20,7 +20,6 @@ describe JourneyLog do
     end
   end
 
-
   describe '#finish' do
     let(:exit_station){double :exit_station}
 
@@ -36,8 +35,14 @@ describe JourneyLog do
       subject.finish(exit_station)
       expect(subject.current_journey_reset?).to be true
     end
-  end
 
-  
+    context 'given no entry station' do
+      it 'should still create a journey' do
+        allow(journey).to receive(:finish).with(exit_station)
+        subject.finish(exit_station)
+        expect(subject.journeys).to include journey
+      end
+    end
+  end
 
 end

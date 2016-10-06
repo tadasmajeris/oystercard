@@ -14,8 +14,13 @@ describe Journey do
   end
 
   describe '#finish' do
+    let(:station2) { double :station }
     it 'returns itself after exiting the journey' do
       expect(subject.finish(station)).to eq subject
+    end
+    it 'records the exit station' do
+      subject.finish(station2)
+      expect(subject.exit_station).to eq station2
     end
   end
 
