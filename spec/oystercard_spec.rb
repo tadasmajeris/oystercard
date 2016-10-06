@@ -46,6 +46,11 @@ describe Oystercard do
         subject.touch_in station
         expect(subject.journey.entry_station).to eq station
       end
+      it 'should charge a fine when touching in twice' do
+        subject.touch_in(station)
+        expect{subject.touch_in(station2)}.to change{ subject.balance }.by (-Oystercard::PENALTY_FARE)
+      end
+
     end
 
     describe "#touch_out" do
@@ -59,7 +64,7 @@ describe Oystercard do
           subject.touch_in station
           #journey = subject.journey
           subject.touch_out station2
-          
+
         end
 
         it "should make 'in_journey' false" do
@@ -74,6 +79,10 @@ describe Oystercard do
           expect(subject.journey).to be nil
         end
       end
+        it 'should charge a fine when touching out twice' do
+          expect{subject.touch_out(station)}.to change{ subject.balance }.by (-Oystercard::PENALTY_FARE)
+        end
+
 
     end
   end
