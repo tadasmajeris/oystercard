@@ -1,3 +1,4 @@
+
 require_relative 'journey'
 
 class Oystercard
@@ -27,7 +28,7 @@ class Oystercard
   def touch_in(station)
     check_minimum
     charge_penalty if double_touch_in?
-    start_journey(station) 
+    start_journey(station)
   end
 
   def touch_out(station)
@@ -50,7 +51,7 @@ class Oystercard
   def check_minimum
     fail "Insufficient money on card for journey." if balance < MINIMUM_FARE
   end
-  
+
   def start_journey(station)
     @journey = Journey.new(station)
   end
@@ -64,9 +65,9 @@ class Oystercard
   end
 
   def double_touch_in?
-  !!@journey
+    !!@journey
   end
-  
+
   def charge_penalty
     @balance -= PENALTY_FARE
     puts "You forgot to touch out" if double_touch_in?
@@ -76,15 +77,15 @@ class Oystercard
   def double_touch_out?
     !@journey
   end
-  
+
   def charge_fare
-   deduct(MINIMUM_FARE)
+    deduct(MINIMUM_FARE)
   end
-  
+
   def complete_journey(station)
     @journey.finish(station)
     @journeys << journey
     @journey = nil
-  end  
+  end
 
 end
