@@ -1,12 +1,17 @@
 require 'journey_log'
 
-
 describe JourneyLog do
 
-  let(:journey){ double :journey }
+  let(:journey){ double :journey, fare: Journey::PENALTY_FARE }
   let(:station){ double :station }
   let(:journey_class){double :journey_class, new: journey}
   subject {described_class.new(journey_class)}
+
+  describe 'Initialization' do
+    it 'sets journeys as empty at start' do
+      expect(subject.journeys).to eq []
+    end
+  end
 
   describe '#start' do
     it 'starts a journey' do
@@ -33,7 +38,7 @@ describe JourneyLog do
     it 'resets current_journey to nil' do
       allow(journey).to receive(:finish).with(exit_station)
       subject.finish(exit_station)
-      expect(subject.current_journey_reset?).to be true
+      expect(subject.no_current_journey?).to be true
     end
 
     context 'given no entry station' do
@@ -45,4 +50,11 @@ describe JourneyLog do
     end
   end
 
+  describe '#last_fare' do
+    it 'should return the last fare' do
+      allow(journey).to receive(:finish).with(station)
+      subject.finish(station)
+      expect(subject.last_fare).to eq Journey::PENALTY_FARE
+    end
+  end
 end

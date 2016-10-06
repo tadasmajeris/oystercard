@@ -11,17 +11,21 @@ class JourneyLog
   end
 
   def finish(station)
-    @journeys << current_journey if current_journey_reset?
+    @journeys << current_journey if no_current_journey?
     current_journey.finish(station)
     @current_journey = nil
   end
 
-  def current_journey_reset?
+  def no_current_journey?
     @current_journey.nil?
   end
 
   def journeys
     @journeys.dup
+  end
+
+  def last_fare
+    @journeys.last.fare
   end
 
   private

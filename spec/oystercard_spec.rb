@@ -4,22 +4,18 @@ describe Oystercard do
 
   let(:station) { double :station }
   let(:station2) { double :station }
-  let(:journey) { {start: station, end: station2} }
+  let(:journey_log) { JourneyLog.new(Journey) }
+  subject { described_class.new(journey_log) }
 
   describe "Initialization of a card" do
     it "has an initial balance of 0" do
       expect(subject.balance).to eq 0
     end
-  
-    it 'is initially not in a journey' do
-      expect(subject).not_to be_in_journey
+
+    it 'should accept journey log as a parameter' do
+      expect(subject.journey_log).to eq journey_log
     end
-  
-    it 'sets journeys as empty at start' do
-      expect(subject.journeys).to eq []
-    end
-    
-   end 
+  end
 
   describe "#top_up" do
     it "can top up the balance" do
@@ -37,41 +33,35 @@ describe Oystercard do
     end
 
     describe "#touch_in" do
-      it "should make 'in_journey' true" do
-        subject.touch_in station
-        expect(subject).to be_in_journey
+      it "starts the journey log" do
+        expect(journey_log).to receive(:start).with(station)
+        subject.touch_in(station)
       end
-      it "should save the entry station" do
-        subject.touch_in station
-        expect(subject.journey[:start]).to eq station
+
+      context "when touching in a second time" do
+        before do
+          subject.touch_in(station)
+        end
+        it "adds another journey" do
+          subject.touch_in(station2)
+          expect(journey_log.journeys.count).to eq 2
+        end
       end
     end
 
     describe "#touch_out" do
-      it "should deduct £#{Oystercard::MINIMUM_FARE}" do
-        expect{subject.touch_out station2}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
-      end
-        
-      context "Complete journey" do
-        before do
+      context "when touched in" do
+        it "should deduct £#{Journey::MIN_FARE}" do
           subject.touch_in station
-          subject.touch_out station2
-        end
-       
-        it "should make 'in_journey' false" do
-          expect(subject).not_to be_in_journey
-        end
-        
-        it "should save the journey" do
-          expect(subject.journeys).to include journey
-        end
-  
-        it "sets journey to empty hash" do
-          expect(subject.journey).to be_empty
+          expect{subject.touch_out station2}.to change{subject.balance}.by(-Journey::MIN_FARE)
         end
       end
-      
-    end 
+      context "when not touched in" do
+        it "still adds the journey" do
+          expect{subject.touch_out(station2)}.to change{journey_log.journeys.count}.by(1)
+        end
+      end
+    end
   end
 
   context "When card has insufficient money" do
