@@ -10,16 +10,16 @@ describe Oystercard do
     it "has an initial balance of 0" do
       expect(subject.balance).to eq 0
     end
-  
+
     it 'is initially not in a journey' do
       expect(subject).not_to be_in_journey
     end
-  
+
     it 'sets journeys as empty at start' do
       expect(subject.journeys).to eq []
     end
-    
-   end 
+
+   end
 
   describe "#top_up" do
     it "can top up the balance" do
@@ -45,33 +45,39 @@ describe Oystercard do
         subject.touch_in station
         expect(subject.journey[:start]).to eq station
       end
+
+      it 'creates a new journey' do
+        journey = subject.touch_in(station)
+        expect(journey.class).to eq Journey
+      end
+
     end
 
     describe "#touch_out" do
       it "should deduct £#{Oystercard::MINIMUM_FARE}" do
         expect{subject.touch_out station2}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
       end
-        
+
       context "Complete journey" do
         before do
           subject.touch_in station
           subject.touch_out station2
         end
-       
+
         it "should make 'in_journey' false" do
           expect(subject).not_to be_in_journey
         end
-        
+
         it "should save the journey" do
           expect(subject.journeys).to include journey
         end
-  
+
         it "sets journey to empty hash" do
           expect(subject.journey).to be_empty
         end
       end
-      
-    end 
+
+    end
   end
 
   context "When card has insufficient money" do

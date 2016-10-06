@@ -23,7 +23,8 @@ class Oystercard
 
   def touch_in(station)
     fail "Insufficient money on card for journey." if balance < MINIMUM_FARE
-    @journey[:start] = station
+    # @journey[:start] = station
+    @journey = Journey.new(station)
   end
 
   def touch_out(station)
