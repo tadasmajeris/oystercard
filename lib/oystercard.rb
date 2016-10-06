@@ -1,3 +1,5 @@
+require_relative 'journey'
+
 class Oystercard
 
   TOP_UP_LIMIT = 90
@@ -28,7 +30,7 @@ class Oystercard
 
   def touch_out(station)
     deduct(MINIMUM_FARE)
-    @journey.end_journey(station)
+    @journey.finish(station)
     @journeys << journey
     @journey = nil
     return_balance
