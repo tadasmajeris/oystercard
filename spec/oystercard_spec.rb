@@ -2,13 +2,13 @@ require 'oystercard'
 
 describe Oystercard do
 
-  let(:station) { double :station }
-  let(:station2) { double :station }
+  let(:station) { double :station, zone: 1 }
+  let(:station2) { double :station, zone: 1 }
   let(:journey_log) { JourneyLog.new(Journey)}
   subject {Oystercard.new(journey_log)}
 
 
-  describe "Initialization of a card" do
+  describe "Initialization" do
     it "has an initial balance of 0" do
       expect(subject.balance).to eq 0
     end
@@ -20,7 +20,6 @@ describe Oystercard do
     it 'should not be touched in' do
       expect(subject).not_to be_touched_in
     end
-
    end
 
   describe "#top_up" do
@@ -48,6 +47,7 @@ describe Oystercard do
         before do
           subject.touch_in(station)
         end
+
         it 'should add another journey regardless' do
           subject.touch_in(station)
           expect(journey_log.journeys.count).to eq 2
@@ -56,7 +56,6 @@ describe Oystercard do
         it 'should charge a penalty fare' do
           expect{ subject.touch_in(station) }.to change{ subject.balance }.by(-Journey::PENALTY_FARE)
         end
-
       end
 
     end
@@ -75,8 +74,8 @@ describe Oystercard do
           expect{subject.touch_out station2}.to change{subject.balance}.by(-Journey::PENALTY_FARE)
         end
       end
-
     end
+
   end
 
   context "When card has insufficient money" do

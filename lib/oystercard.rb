@@ -13,15 +13,15 @@ class Oystercard
     @touched_in = false
   end
 
-  def top_up money
-    fail "Top-up limit of £#{TOP_UP_LIMIT} exceeded." if balance + money > TOP_UP_LIMIT
-    @balance += money
+  def top_up(amount)
+    fail_if_limit_exceeded(amount)
+    @balance += amount
     return_balance
   end
 
   def touch_in(station)
-    fail "Insufficient money on card for journey." if balance < Journey::MINIMUM_FARE
-    deduct(journey_log.journeys.last.fare) if touched_in?
+    fail_if_no_money
+    deduct_fare if touched_in?
     journey_log.start(station)
     @touched_in = true
   end
@@ -29,7 +29,7 @@ class Oystercard
   def touch_out(station)
     @touched_in = false
     journey_log.finish(station)
-    deduct(journey_log.journeys.last.fare)
+    deduct_fare
     return_balance
   end
 
@@ -38,6 +38,18 @@ class Oystercard
   end
 
   private
+
+  def fail_if_limit_exceeded(amount)
+    fail "Top-up limit of £#{TOP_UP_LIMIT} exceeded." if balance + amount > TOP_UP_LIMIT
+  end
+
+  def fail_if_no_money
+    fail "Insufficient money on card for journey." if balance < Journey::MINIMUM_FARE
+  end
+
+  def deduct_fare
+    deduct(journey_log.journeys.last.fare)
+  end
 
   def return_balance
     "Your balance is £#{balance}"
