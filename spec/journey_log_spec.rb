@@ -27,6 +27,15 @@ describe JourneyLog do
   end
 
   describe '#finish' do
+    before do
+      allow(journey).to receive(:finish).with(exit_station)
+      allow(journey_class).to receive(:new).and_return journey
+    end
+
+    it 'should update the current journey' do
+      expect(journey).to receive(:finish).with(exit_station)
+      subject.finish(exit_station)
+    end
     it 'should set the current journey to nil' do
       subject.finish(exit_station)
       expect(subject.no_current_journey?).to be true
@@ -35,7 +44,6 @@ describe JourneyLog do
     context 'given no entry station' do
 
       it 'should still record a journey' do
-        allow(journey_class).to receive(:new).and_return journey
         subject.finish(exit_station)
         expect(subject.journeys).to include journey
       end

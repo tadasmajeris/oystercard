@@ -14,6 +14,7 @@ class JourneyLog
 
   def finish(station)
     @journeys << current_journey if no_current_journey?
+    current_journey.finish(station)
     @current_journey = nil
   end
 

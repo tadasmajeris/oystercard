@@ -4,19 +4,21 @@ describe Oystercard do
 
   let(:station) { double :station }
   let(:station2) { double :station }
-  let(:journey) { {start: station, end: station2} }
+  let(:journey_log) { JourneyLog.new(Journey)}
+  subject {Oystercard.new(journey_log)}
+
 
   describe "Initialization of a card" do
     it "has an initial balance of 0" do
       expect(subject.balance).to eq 0
     end
 
-    it 'is initially not in a journey' do
-      expect(subject).not_to be_in_journey
+    it "can be initialized with a journey_log" do
+      expect(subject.journey_log).to eq journey_log
     end
 
-    it 'sets journeys as empty at start' do
-      expect(subject.journeys).to eq []
+    it 'should not be touched in' do
+      expect(subject).not_to be_touched_in
     end
 
    end
@@ -37,38 +39,40 @@ describe Oystercard do
     end
 
     describe "#touch_in" do
-      it "should make 'in_journey' true" do
-        subject.touch_in station
-        expect(subject).to be_in_journey
+      it 'logs the journey' do
+        subject.touch_in(station)
+        expect(journey_log.journeys.count).to eq 1
       end
-      it "should save the entry station" do
-        subject.touch_in station
-        expect(subject.journey[:start]).to eq station
+
+      context 'when already touched in' do
+        before do
+          subject.touch_in(station)
+        end
+        it 'should add another journey regardless' do
+          subject.touch_in(station)
+          expect(journey_log.journeys.count).to eq 2
+        end
+
+        it 'should charge a penalty fare' do
+          expect{ subject.touch_in(station) }.to change{ subject.balance }.by(-Journey::PENALTY_FARE)
+        end
+
       end
 
     end
 
     describe "#touch_out" do
-      it "should deduct £#{Oystercard::MINIMUM_FARE}" do
-        expect{subject.touch_out station2}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
+
+      context 'given an entry station' do
+        before { subject.touch_in(station) }
+        it "should deduct £#{Journey::MINIMUM_FARE}" do
+          expect{subject.touch_out station2}.to change{subject.balance}.by(-Journey::MINIMUM_FARE)
+        end
       end
 
-      context "Complete journey" do
-        before do
-          subject.touch_in station
-          subject.touch_out station2
-        end
-
-        it "should make 'in_journey' false" do
-          expect(subject).not_to be_in_journey
-        end
-
-        it "should save the journey" do
-          expect(subject.journeys).to include journey
-        end
-
-        it "sets journey to empty hash" do
-          expect(subject.journey).to be_empty
+      context 'when not given an entry station' do
+        it 'should deduct the penalty fare' do
+          expect{subject.touch_out station2}.to change{subject.balance}.by(-Journey::PENALTY_FARE)
         end
       end
 
