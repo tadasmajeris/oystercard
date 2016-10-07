@@ -1,23 +1,33 @@
-require_relative 'oystercard'
 require_relative 'journey'
 
 class JourneyLog
-  
-  def initialize(station)
+
+  def initialize(journey_class)
+    @journey_class = journey_class
     @journeys = []
-    @journey = station
   end
-  
-  def start_journey(station)
-    @journey = Journey.new(station)
+
+  def start(station)
+    @current_journey = @journey_class.new(station)
+    @journeys << current_journey
   end
-    
-  def end_journey(station)
-    @journey.finish(station)
+
+  def finish(station)
+    @journeys << current_journey if no_current_journey?
+    @current_journey = nil
   end
-    
-  def record(journey)
-    @journeys << journey
+
+  def journeys
+    @journeys.dup
   end
-    
+
+  def no_current_journey?
+    @current_journey.nil?
+  end
+
+  private
+
+  def current_journey
+    @current_journey ||= @journey_class.new
+  end
 end

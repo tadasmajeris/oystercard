@@ -21,10 +21,10 @@ describe Journey do
 
   context 'when given an entry station' do
     subject(:journey) { Journey.new(station) }
+
     it "has an entry station" do
       expect(journey.entry_station).to eq station
     end
-
 
     context 'when given an exit station' do
       let(:other_station) {double :other_station}

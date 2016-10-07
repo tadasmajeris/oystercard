@@ -1,26 +1,51 @@
 require 'journey_log'
 
+describe JourneyLog do
+  let(:station) { double :station }
+  let(:exit_station) { double :station }
+  let(:journey) { double :journey }
+  let(:journey_class) { double :journey_class, new: journey }
+  subject { JourneyLog.new(journey_class) }
 
-# describe JourneyLog do
-# subject (:journeylog) {described_class.new(station)}
-# let(:station){double :station}
-# let(:station2){double :station}
-# let(:journey) {double :journey, entry_station: station, exit_station: station2}
-# allow(journey).to receive(:finish).and_return {@exit_station = station2}
-# allow(journey).to receive(:initialize).and_return{@entrance_station = station1}
+  describe 'initialization' do
+    it 'has empty journey log' do
+      expect(subject.journeys).to be_empty
+    end
+  end
 
-#   it 'starts a journey' do
-#     subject.start_journey(station)
-#     expect(subject.journey.entry_station).to eq station
-#   end
+  describe '#start' do
+    it 'start a journey' do
+      expect(journey_class).to receive(:new).and_return journey
+      subject.start(station)
+    end
 
-#   it 'ends a journey' do
-#     subject.end_journey(station2)
-#     expect(subject.journey.exit_station).to eq station
-#   end
+    it 'records a journey' do
+      allow(journey_class).to receive(:new).and_return journey
+      subject.start(station)
+      expect(subject.journeys).to include journey
+    end
+  end
 
-#   it 'stores a journey' do
-#     expect { subject.record(journey) }.to change { subject.log.count }.by 1
-#   end
+  describe '#finish' do
+    it 'should set the current journey to nil' do
+      subject.finish(exit_station)
+      expect(subject.no_current_journey?).to be true
+    end
 
-# end
+    context 'given no entry station' do
+
+      it 'should still record a journey' do
+        allow(journey_class).to receive(:new).and_return journey
+        subject.finish(exit_station)
+        expect(subject.journeys).to include journey
+      end
+
+      it 'should save the exit station' do
+        allow(journey).to receive(:exit_station).and_return exit_station
+        subject.finish(exit_station)
+        expect(subject.journeys.last.exit_station).to eq exit_station
+      end
+    end
+  end
+
+end
