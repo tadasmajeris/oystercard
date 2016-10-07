@@ -3,39 +3,40 @@ require 'journey'
 describe Journey do
 
   let(:station){double :station}
-  let(:station2){double :station}
-  subject(:journey) { Journey.new(station) }
 
   describe "Initialization" do
-
-
-    it "has an entry station" do
-      expect(journey.entry_station).to eq station
+    it 'knows a journey is not complete' do
+      expect(subject).not_to be_complete
+    end
+    it 'defaults to penalty fare' do
+      expect(subject.fare).to eq Journey::PENALTY_FARE
     end
   end
-
-  it {is_expected.to respond_to :finish}
-  it {is_expected.to respond_to :fare}
-  it {is_expected.to respond_to :complete?}
 
   describe '#finish' do
     it 'adds an exit station'  do
-      subject.finish(station)
-      expect(subject.exit_station).to eq station
+      expect(subject.finish(station)).to eq subject
     end
   end
 
-  describe '#complete' do
-    it "sets the journey to complete" do
-      subject.finish (station)
-      expect(subject).to be_complete
+  context 'when given an entry station' do
+    subject(:journey) { Journey.new(station) }
+    it "has an entry station" do
+      expect(journey.entry_station).to eq station
     end
-  end
 
-  describe '#fare' do
-    it "sets the correct fare" do
-      subject.finish (station)
-      expect(subject.fare).to eq Journey::MINIMUM_FARE
+
+    context 'when given an exit station' do
+      let(:other_station) {double :other_station}
+      before {subject.finish(station)}
+
+      it "sets the journey to complete" do
+        expect(subject).to be_complete
+      end
+
+      it 'calculates a fare' do
+        expect(subject.fare).to eq Journey::MINIMUM_FARE
+      end
     end
   end
 
